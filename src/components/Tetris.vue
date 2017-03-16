@@ -6,14 +6,34 @@
         <table>
             <tr v-for="col in plane"><td v-for="item in col" style="width: 1em; height: 1em;" :style="{ background: item.on? 'black': 'gray' }"></td></tr>
         </table>
+        <div>
+            <table>
+                <tr>
+                    <td></td>
+                    <td><button>UP</button></td>
+                    <td></td>
+                </tr>
+                    <td><button @click="rotateLeft">LEFT</button></td>
+                    <td><button>DOWN</button></td>
+                    <td><button @click="rotateRight">RIGHT</button></td>
+                <tr>
+                </tr>
+            </table>
+        </div>
     </div>
 </template>
 <script>
-import { combine, newPlane, setFactory, nextFrame as planeNextFrame, set as setPlane } from '../tetris-logic'
+import { combine, newPlane, setFactory, shift, set as setPlane, countCombo, fillCombo } from '../tetris-logic'
 import shapes from '../shapes'
+
 let plane = newPlane()
 const set = setFactory(plane)
-let next = newPlane(shapes.randomShape())
+let frontLayer = shapes.randomShape()
+let nextShape = shapes.randomShape()
+let next = newPlane(nextShape)
+
+const rotate = (s) => shapes.rotate(s)
+
 export default {
   name: 'tetris',
   data () {
@@ -21,16 +41,35 @@ export default {
       plane,
       next: next
     }
+  },
+  methods: {
+    rotateLeft () {
+      frontLayer = rotate(rotate(rotate(frontLayer)))
+    },
+    rotateRight () {
+      frontLayer = rotate(frontLayer)
+    }
   }
 }
-let cnt = 0
-setTimeout(function nextFrame () {
-  if ((cnt += 1) % 10 === 0) {
-    set(combine(planeNextFrame(plane), next))
-    setPlane(next, newPlane(shapes.randomShape()))
+
+let offsetX = 0
+let offsetY = 0
+let backLayer = newPlane()
+;(function FrameAnimation () {
+  let result = combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY }), backLayer)
+  set(result)
+  let combo = countCombo(result)
+  if (combo) {
+    frontLayer = nextShape
+    nextShape = shapes.randomShape()
+    setPlane(next, newPlane(nextShape))
+    offsetX = 0
+    fillCombo(result, combo)
+    setPlane(backLayer, shift(result, { x: combo || 1, y: 0 }))
   } else {
-    set(planeNextFrame(plane))
+    offsetX += 1
   }
-  setTimeout(nextFrame, 1000)
-}, 1000)
+
+  setTimeout(FrameAnimation, 1000)
+}())
 </script>

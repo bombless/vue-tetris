@@ -6,13 +6,15 @@ export {
     combine,
     set,
     setFactory,
-    nextFrame
+    countCombo,
+    fillCombo,
+    shift
 }
 
 function newPlane (generator) {
   let data = []
 
-  generator = generator || (() => false)
+  generator = generator ? generator.generator : () => false
 
   for (let i = 0; i < rowsCount; ++i) {
     let col = []
@@ -52,21 +54,104 @@ function set (target, data) {
 }
 
 function setFactory (target) {
-  return (data) => set(target, data)
+  return data => set(target, data)
 }
 
-function nextFrame (plane) {
-  let data = []
+function countCombo (plane) {
+  let everOn = false
+  let allOn = true
+  let firstConflict
 
   for (let i = 0; i < colsCount; ++i) {
     if (plane[rowsCount - 1][i].on) {
-      throw new Error('conflict on ' + (rowsCount - 1) + ',' + i)
+      everOn = true
+      if (!firstConflict) {
+        firstConflict = [rowsCount - 1, i]
+      }
+    } else {
+      allOn = false
     }
   }
+
+  if (allOn) {
+    let combo = 1
+    for (let i = rowsCount - 2; ; --i, combo += 1) {
+      for (let j = 0; i < colsCount; ++i) {
+        if (!plane[i][j].on) {
+          return combo
+        }
+      }
+    }
+  }
+
+  if (everOn) throw new Error('conflict on ' + firstConflict[0] + ',' + firstConflict[1])
+}
+
+function fillCombo (plane, n) {
+  let data = []
   for (let i = 0; i < rowsCount; ++i) {
     let col = []
     for (let j = 0; j < colsCount; ++j) {
-      col.push({ on: i ? plane[i - 1][j].on : false })
+      col.push(i >= rowsCount - n ? false : plane[i][j])
+    }
+    data.push(col)
+  }
+  return data
+}
+
+function shift (plane, offset) {
+  if (offset.x > 0) {
+    for (let i = rowsCount - offset.x; i < rowsCount; ++i) {
+      for (let j = 0; j < colsCount; ++j) {
+        if (plane[i][j].on) {
+          throw new Error('conflict on ' + i + ',' + j)
+        }
+      }
+    }
+  }
+
+  if (offset.x < 0) {
+    for (let i = 0; i < -offset.x; ++i) {
+      for (let j = 0; j < colsCount; ++j) {
+        if (plane[i][j].on) {
+          throw new Error('conflict on ' + i + ',' + j)
+        }
+      }
+    }
+  }
+
+  if (offset.y > 0) {
+    for (let i = 0; i < rowsCount; ++i) {
+      for (let j = colsCount - offset.y; j < colsCount; ++j) {
+        if (plane[i][j].on) {
+          throw new Error('conflict on ' + i + ',' + j)
+        }
+      }
+    }
+  }
+
+  if (offset.y < 0) {
+    for (let i = 0; i < rowsCount; ++i) {
+      for (let j = 0; j < -offset.y; ++j) {
+        if (plane[i][j].on) {
+          throw new Error('conflict on ' + i + ',' + j)
+        }
+      }
+    }
+  }
+
+  let data = []
+  for (let i = 0; i < rowsCount; ++i) {
+    let col = []
+    for (let j = 0; j < colsCount; ++j) {
+      if (i - offset.x < 0 ||
+          i - offset.x >= rowsCount ||
+          j - offset.y < 0 ||
+          j - offset.y >= colsCount) {
+        col.push({ on: false })
+        continue
+      }
+      col.push({ on: plane[i - offset.x][j - offset.y].on })
     }
     data.push(col)
   }
