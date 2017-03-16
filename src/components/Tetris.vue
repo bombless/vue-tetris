@@ -32,7 +32,7 @@ let frontLayer = shapes.randomShape()
 let nextShape = shapes.randomShape()
 let next = newPlane(nextShape)
 
-const rotate = (s) => shapes.rotate(s)
+const rotate = (s) => shapes.rotate(s) // TODO: adjust basic rotation data
 
 export default {
   name: 'tetris',
