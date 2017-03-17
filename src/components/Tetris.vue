@@ -1,6 +1,6 @@
 <template>
     <div>
-        <table>
+        <table id="next">
             <tr v-for="col in next"><td v-for="item in col" style="width: 1em; height: 1em;" :style="{ background: item.on? 'rgb(118,209,94)': 'white' }"></td></tr>
         </table>
         <table>
@@ -10,18 +10,21 @@
             <table>
                 <tr>
                     <td></td>
-                    <td><button>UP</button></td>
+                    <td><button @click="rotate">UP</button></td>
                     <td></td>
                 </tr>
-                    <td><button @click="rotateLeft">LEFT</button></td>
+                    <td><button @click="left">LEFT</button></td>
                     <td><button>DOWN</button></td>
-                    <td><button @click="rotateRight">RIGHT</button></td>
+                    <td><button @click="right">RIGHT</button></td>
                 <tr>
                 </tr>
             </table>
         </div>
     </div>
 </template>
+<style>
+#next { border: 1px solid black; }
+</style>
 <script>
 import { combine, newPlane, setFactory, shift, set as setPlane, countCombo, fillCombo } from '../tetris-logic'
 import shapes from '../shapes'
@@ -29,10 +32,12 @@ import shapes from '../shapes'
 let plane = newPlane()
 const set = setFactory(plane)
 let frontLayer = shapes.randomShape()
-let nextShape = shapes.randomShape()
-let next = newPlane(nextShape)
+let nextShape = shapes.localize(shapes.randomShape())
+let scale = shapes.getScale(nextShape)
+let next = newPlane(nextShape, scale.rowsCount, scale.colsCount)
 
-const rotate = (s) => shapes.rotate(s) // TODO: adjust basic rotation data
+let offsetX = 0
+let offsetY = 0
 
 export default {
   name: 'tetris',
@@ -43,17 +48,18 @@ export default {
     }
   },
   methods: {
-    rotateLeft () {
-      frontLayer = rotate(rotate(rotate(frontLayer)))
+    rotate () {
+      frontLayer = shapes.rotate(frontLayer)
     },
-    rotateRight () {
-      frontLayer = rotate(frontLayer)
+    left () {
+      offsetY -= 1
+    },
+    right () {
+      offsetY += 1
     }
   }
 }
 
-let offsetX = 0
-let offsetY = 0
 let backLayer = newPlane()
 ;(function FrameAnimation () {
   let result = combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY }), backLayer)
@@ -61,8 +67,9 @@ let backLayer = newPlane()
   let combo = countCombo(result)
   if (combo) {
     frontLayer = nextShape
-    nextShape = shapes.randomShape()
-    setPlane(next, newPlane(nextShape))
+    nextShape = shapes.localize(shapes.randomShape())
+    scale = shapes.getScale(nextShape)
+    setPlane(next, newPlane(nextShape, scale.rowsCount, scale.colsCount))
     offsetX = 0
     fillCombo(result, combo)
     setPlane(backLayer, shift(result, { x: combo || 1, y: 0 }))

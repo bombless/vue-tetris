@@ -1,5 +1,5 @@
 
-import { rowsCount, colsCount } from './consts'
+import { rowsCount as stdRowsCount, rowsCount, colsCount as stdColsCount, colsCount } from './consts'
 
 export {
     newPlane,
@@ -11,7 +11,7 @@ export {
     shift
 }
 
-function newPlane (generator) {
+function newPlane (generator, rowsCount = stdRowsCount, colsCount = stdColsCount) {
   let data = []
 
   generator = generator ? generator.generator : () => false

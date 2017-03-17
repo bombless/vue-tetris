@@ -14,18 +14,18 @@ const dataSet = [
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
-  [(x, y) => (x === 0 && y === centerY) || (x === 1 && Math.abs(y - centerY) <= 1), 0, 2, centerY - 1, centerY + 1],
-  [(x, y) => (x === 1 && y === centerY) || (x === 0 && Math.abs(y - centerY) <= 1), 0, 2, centerY - 1, centerY + 1],
-  [(x, y) => (x <= 2 && y === centerY) || (x === 1 && y === centerY - 1), 0, 2, centerY - 1, centerY + 1],
-  [(x, y) => (x <= 2 && y === centerY) || (x === 1 && y === centerY + 1), 0, 2, centerY - 1, centerY + 1],
-  [originalLightning, 0, 2, centerY - 1, centerY + 1],
-  [lightningMark1, 0, 2, centerY - 1, centerY + 1],
-  [lightningMark2, 0, 2, centerY - 1, centerY + 1],
-  [lightningMark3, 0, 2, centerY - 1, centerY + 1],
-  [originalBar, 0, 3, centerY - 1, centerY + 3],
-  [barMark1, 0, 3, centerY - 1, centerY + 3],
-  [barMark2, 0, 3, centerY - 1, centerY + 3],
-  [barMark3, 0, 3, centerY - 1, centerY + 3]
+  [(x, y) => (x === 0 && y === centerY) || (x === 1 && Math.abs(y - centerY) <= 1), 0, 3, centerY - 1, centerY + 2],
+  [(x, y) => (x === 1 && y === centerY) || (x === 0 && Math.abs(y - centerY) <= 1), 0, 3, centerY - 1, centerY + 2],
+  [(x, y) => (x <= 2 && y === centerY) || (x === 1 && y === centerY - 1), 0, 3, centerY - 1, centerY + 2],
+  [(x, y) => (x <= 2 && y === centerY) || (x === 1 && y === centerY + 1), 0, 3, centerY - 1, centerY + 2],
+  [originalLightning, 0, 3, centerY - 1, centerY + 2],
+  [lightningMark1, 0, 3, centerY - 1, centerY + 2],
+  [lightningMark2, 0, 3, centerY - 1, centerY + 2],
+  [lightningMark3, 0, 3, centerY - 1, centerY + 2],
+  [originalBar, 0, 4, centerY - 1, centerY + 4],
+  [barMark1, 0, 4, centerY - 1, centerY + 3],
+  [barMark2, 0, 4, centerY - 1, centerY + 3],
+  [barMark3, 0, 4, centerY - 1, centerY + 3]
 ]
 
 function originalLightning (x, y) {
@@ -70,5 +70,20 @@ export default {
   rotate (shape) {
     let result = booleanRotator(shape.generator, shape.range.leftTop, shape.range.rightBottom)
     return { generator: result, range: shape.range }
+  },
+  localize (shape) {
+    return {
+      generator: (x, y) => shape.generator(x + shape.range.leftTop.x, y + shape.range.leftTop.y),
+      range: {
+        leftTop: { x: 0, y: 0 },
+        rightBottom: { x: shape.range.rightBottom.x - shape.range.leftTop.x, y: shape.range.rightBottom.y - shape.range.leftTop.y }
+      }
+    }
+  },
+  getScale (shape) {
+    return {
+      rowsCount: shape.range.rightBottom.x - shape.range.leftTop.x,
+      colsCount: shape.range.rightBottom.y - shape.range.leftTop.y
+    }
   }
 }
