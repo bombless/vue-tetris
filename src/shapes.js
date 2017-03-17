@@ -9,7 +9,7 @@ const barMark1 = booleanRotator(originalBar, { x: 0, y: centerY - 1 }, { x: 4, y
 const barMark2 = booleanRotator(barMark1, { x: 0, y: centerY - 1 }, { x: 4, y: centerY + 3 })
 const barMark3 = booleanRotator(barMark2, { x: 0, y: centerY - 1 }, { x: 4, y: centerY + 3 })
 
-const dataSet = [
+const dataSet = [ // TODO: add another kind of lightning
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
