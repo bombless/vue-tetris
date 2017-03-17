@@ -14,7 +14,7 @@
                     <td></td>
                 </tr>
                     <td><button @click="left">LEFT</button></td>
-                    <td><button>DOWN</button></td>
+                    <td><button @click="down">DOWN</button></td>
                     <td><button @click="right">RIGHT</button></td>
                 <tr>
                 </tr>
@@ -31,7 +31,7 @@ import shapes from '../shapes'
 
 let plane = newPlane()
 const set = setFactory(plane)
-let frontLayer = shapes.randomShape()
+let frontLayer = shapes.testShape()
 let nextShape = shapes.localize(shapes.randomShape())
 let scale = shapes.getScale(nextShape)
 let next = newPlane(nextShape, scale.rowsCount, scale.colsCount)
@@ -52,42 +52,56 @@ export default {
       frontLayer = shapes.rotate(frontLayer)
     },
     left () {
-      offsetY -= 1
+      try {
+        combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY - 1 }), backLayer)
+        offsetY -= 1
+      } catch (e) {
+
+      }
     },
     right () {
-      offsetY += 1
+      try {
+        combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY + 1 }), backLayer)
+        offsetY += 1
+      } catch (e) {
+      }
+    },
+    down () {
+      try {
+        combine(shift(newPlane(frontLayer), { x: offsetX + 1, y: offsetY }), backLayer)
+        offsetX += 1
+      } catch (e) {
+      }
     }
   }
 }
 
 let backLayer = newPlane()
 ;(function FrameAnimation () {
-  try {
-    combine(shift(newPlane(frontLayer), { x: offsetX + 1, y: offsetY }), backLayer)
-    offsetX += 1
-    let result = combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY }), backLayer)
-    set(result)
-  } catch (e) {
-    let result = combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY }), backLayer)
-    let combo = countCombo(result)
-    if (combo) {
-      frontLayer = nextShape
-      nextShape = shapes.localize(shapes.randomShape())
-      scale = shapes.getScale(nextShape)
-      setPlane(next, newPlane(nextShape, scale.rowsCount, scale.colsCount))
-      offsetX = 0
-      fillCombo(result, combo)
-      setPlane(backLayer, shift(result, { x: combo, y: 0 }))
-      set(result)
-    } else {
-      setPlane(backLayer, result)
-      frontLayer = nextShape
-      nextShape = shapes.localize(shapes.randomShape())
-      scale = shapes.getScale(nextShape)
-      setPlane(next, newPlane(nextShape, scale.rowsCount, scale.colsCount))
-      offsetX = 0
-    }
+  function switchNext () {
+    frontLayer = nextShape
+    nextShape = shapes.localize(shapes.randomShape())
+    scale = shapes.getScale(nextShape)
+    setPlane(next, newPlane(nextShape, scale.rowsCount, scale.colsCount))
   }
+  let result = combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY }), backLayer)
+  let combo = countCombo(result)
+  if (combo) {
+    switchNext()
+    setPlane(backLayer, shift(fillCombo(result, combo), { x: combo, y: 0 }))
+    offsetX = offsetY = 0
+  } else {
+    try {
+      set(combine(shift(newPlane(frontLayer), { x: offsetX + 1, y: offsetY }), backLayer))
+      offsetX += 1
+    } catch (e) {
+      switchNext()
+      setPlane(backLayer, result)
+      offsetX = offsetY = 0
+    }
+    set(result)
+  }
+
   setTimeout(FrameAnimation, 1000)
 }())
 </script>

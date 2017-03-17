@@ -8,7 +8,8 @@ export {
     setFactory,
     countCombo,
     fillCombo,
-    shift
+    shift,
+    testPlane
 }
 
 function newPlane (generator, rowsCount = stdRowsCount, colsCount = stdColsCount) {
@@ -26,7 +27,21 @@ function newPlane (generator, rowsCount = stdRowsCount, colsCount = stdColsCount
   return data
 }
 
+function testPlane () {
+  let data = []
+
+  for (let i = 0; i < rowsCount; ++i) {
+    let col = []
+    for (let j = 0; j < colsCount; ++j) {
+      col.push({ on: i === rowsCount - 1 })
+    }
+    data.push(col)
+  }
+  return data
+}
+
 function combine (lhs, rhs) {
+  console.log(lhs, rhs)
   let data = []
 
   for (let i = 0; i < rowsCount; ++i) {
@@ -62,6 +77,7 @@ function setFactory (target) {
 }
 
 function countCombo (plane) {
+  console.log(plane)
   for (let i = 0; i < colsCount; ++i) {
     if (!plane[rowsCount - 1][i].on) {
       return
@@ -69,7 +85,7 @@ function countCombo (plane) {
   }
   let combo = 1
   for (let i = rowsCount - 2; ; --i, combo += 1) {
-    for (let j = 0; i < colsCount; ++i) {
+    for (let j = 0; j < colsCount; ++j) {
       if (!plane[i][j].on) {
         return combo
       }

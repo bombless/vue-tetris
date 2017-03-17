@@ -1,5 +1,5 @@
 
-import { centerY } from './consts'
+import { centerY, colsCount } from './consts'
 
 const lightningMark1 = booleanRotator(originalLightning, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
 const lightningMark2 = booleanRotator(lightningMark1, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
@@ -56,13 +56,22 @@ function booleanRotator (generator, leftTop, rightBottom) {
 }
 
 export default {
-  randomShape: () => {
+  randomShape () {
     let result = dataSet[Math.floor(Math.random() * dataSet.length)]
     return {
       generator: result[0],
       range: {
         leftTop: { x: result[1], y: result[3] },
         rightBottom: { x: result[2], y: result[4] }
+      }
+    }
+  },
+  testShape () {
+    return {
+      generator: x => x === 0,
+      range: {
+        leftTop: { x: 0, y: 0 },
+        rightBottom: { x: 1, y: colsCount }
       }
     }
   },
