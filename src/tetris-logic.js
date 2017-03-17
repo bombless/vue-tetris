@@ -46,11 +46,15 @@ function combine (lhs, rhs) {
 }
 
 function set (target, data) {
-  for (let i = 0; i < rowsCount; ++i) {
-    for (let j = 0; j < colsCount; ++j) {
+  for (let i = 0; i < data.length; ++i) {
+    if (typeof target[i] === 'undefined') target.push([])
+    for (let j = 0; j < data[i].length; ++j) {
+      if (typeof target[i][j] === 'undefined') target[i].push({})
       target[i][j].on = data[i][j].on
     }
+    target[i].length = data[i].length
   }
+  target.length = data.length
 }
 
 function setFactory (target) {
@@ -58,33 +62,19 @@ function setFactory (target) {
 }
 
 function countCombo (plane) {
-  let everOn = false
-  let allOn = true
-  let firstConflict
-
   for (let i = 0; i < colsCount; ++i) {
-    if (plane[rowsCount - 1][i].on) {
-      everOn = true
-      if (!firstConflict) {
-        firstConflict = [rowsCount - 1, i]
-      }
-    } else {
-      allOn = false
+    if (!plane[rowsCount - 1][i].on) {
+      return
     }
   }
-
-  if (allOn) {
-    let combo = 1
-    for (let i = rowsCount - 2; ; --i, combo += 1) {
-      for (let j = 0; i < colsCount; ++i) {
-        if (!plane[i][j].on) {
-          return combo
-        }
+  let combo = 1
+  for (let i = rowsCount - 2; ; --i, combo += 1) {
+    for (let j = 0; i < colsCount; ++i) {
+      if (!plane[i][j].on) {
+        return combo
       }
     }
   }
-
-  if (everOn) throw new Error('conflict on ' + firstConflict[0] + ',' + firstConflict[1])
 }
 
 function fillCombo (plane, n) {

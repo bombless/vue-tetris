@@ -1,13 +1,13 @@
 
 import { centerY } from './consts'
 
-const lightningMark1 = booleanRotator(originalLightning, { x: 0, y: centerY - 1 }, { x: 2, y: centerY + 1 })
-const lightningMark2 = booleanRotator(lightningMark1, { x: 0, y: centerY - 1 }, { x: 2, y: centerY + 1 })
-const lightningMark3 = booleanRotator(lightningMark2, { x: 0, y: centerY - 1 }, { x: 2, y: centerY + 1 })
+const lightningMark1 = booleanRotator(originalLightning, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
+const lightningMark2 = booleanRotator(lightningMark1, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
+const lightningMark3 = booleanRotator(lightningMark2, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
 
-const barMark1 = booleanRotator(originalBar, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
-const barMark2 = booleanRotator(barMark1, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
-const barMark3 = booleanRotator(barMark2, { x: 0, y: centerY - 1 }, { x: 3, y: centerY + 2 })
+const barMark1 = booleanRotator(originalBar, { x: 0, y: centerY - 1 }, { x: 4, y: centerY + 3 })
+const barMark2 = booleanRotator(barMark1, { x: 0, y: centerY - 1 }, { x: 4, y: centerY + 3 })
+const barMark3 = booleanRotator(barMark2, { x: 0, y: centerY - 1 }, { x: 4, y: centerY + 3 })
 
 const dataSet = [
   [(x, y) => (y === centerY || y + 1 === centerY) && x <= 1, 0, 2, centerY - 1, centerY + 1],
@@ -42,13 +42,12 @@ function originalBar (x, y) {
 
 function booleanRotator (generator, leftTop, rightBottom) {
   return (x, y) => {
-    if (x >= leftTop.x && x <= rightBottom.x && y >= leftTop.y && y <= rightBottom.y) {
+    if (x >= leftTop.x && x < rightBottom.x && y >= leftTop.y && y < rightBottom.y) {
       let offsetX = x - leftTop.x
       let offsetY = y - leftTop.y
       let width = rightBottom.x - leftTop.x
-      let height = rightBottom.y - leftTop.y
-      let resultX = height - offsetY + leftTop.x
-      let resultY = width - offsetX + leftTop.y
+      let resultX = offsetY + leftTop.x
+      let resultY = width - 1 - offsetX + leftTop.y
       return generator(resultX, resultY)
     } else {
       return generator(x, y)
