@@ -41,7 +41,6 @@ function testPlane () {
 }
 
 function combine (lhs, rhs) {
-  console.log(lhs, rhs)
   let data = []
 
   for (let i = 0; i < rowsCount; ++i) {
@@ -77,7 +76,6 @@ function setFactory (target) {
 }
 
 function countCombo (plane) {
-  console.log(plane)
   for (let i = 0; i < colsCount; ++i) {
     if (!plane[rowsCount - 1][i].on) {
       return

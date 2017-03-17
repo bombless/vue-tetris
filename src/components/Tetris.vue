@@ -31,10 +31,10 @@ import shapes from '../shapes'
 
 let plane = newPlane()
 const set = setFactory(plane)
-let frontLayer = shapes.testShape()
-let nextShape = shapes.localize(shapes.randomShape())
+let frontLayer = shapes.randomShape()
+let nextShape = shapes.randomShape()
 let scale = shapes.getScale(nextShape)
-let next = newPlane(nextShape, scale.rowsCount, scale.colsCount)
+let next = newPlane(shapes.localize(nextShape), scale.rowsCount, scale.colsCount)
 
 let offsetX = 0
 let offsetY = 0
@@ -77,12 +77,13 @@ export default {
 }
 
 let backLayer = newPlane()
+let stop = false
 ;(function FrameAnimation () {
   function switchNext () {
     frontLayer = nextShape
-    nextShape = shapes.localize(shapes.randomShape())
+    nextShape = shapes.randomShape()
     scale = shapes.getScale(nextShape)
-    setPlane(next, newPlane(nextShape, scale.rowsCount, scale.colsCount))
+    setPlane(next, newPlane(shapes.localize(nextShape), scale.rowsCount, scale.colsCount))
   }
   let result = combine(shift(newPlane(frontLayer), { x: offsetX, y: offsetY }), backLayer)
   let combo = countCombo(result)
@@ -95,13 +96,14 @@ let backLayer = newPlane()
       set(combine(shift(newPlane(frontLayer), { x: offsetX + 1, y: offsetY }), backLayer))
       offsetX += 1
     } catch (e) {
+      // stop = true
       switchNext()
       setPlane(backLayer, result)
       offsetX = offsetY = 0
     }
     set(result)
   }
-
-  setTimeout(FrameAnimation, 1000)
+  window.frontLayer = frontLayer
+  if (!stop) setTimeout(FrameAnimation, 1000)
 }())
 </script>
